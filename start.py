@@ -1,4 +1,4 @@
-from app.hardware.SetupSimulation import Setup
+from app.hardware.setup_simulation import Setup
 # from app.hardware.Setup import Setup
 
 def main():
