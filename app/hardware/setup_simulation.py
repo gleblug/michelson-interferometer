@@ -3,7 +3,7 @@ from time import sleep
 from datetime import datetime
 from random import random
 
-class Setup:
+class SetupSimulation:
 	def __init__(self) -> None:
 		self.data = []
 
