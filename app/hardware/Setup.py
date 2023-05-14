@@ -4,7 +4,7 @@ import numpy as np
 from time import sleep
 from datetime import datetime
 
-from Gpib import *
+from Gpib import Gpib
 
 class Setup:
 	def __init__(self) -> None:
@@ -64,13 +64,3 @@ class Setup:
 
 		filename = f"data_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
 		np.savetxt(filename, self.data, delimiter=",", header="voltage,current", comments="")
-
-		return filename
-
-
-def main():
-	setup = Setup()
-	filename = setup.run()
-
-if __name__ == '__main__':
-	main()
