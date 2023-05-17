@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask
+from flask_cors import CORS
 from markupsafe import escape
 import plotly.express as px
 import plotly
@@ -12,6 +13,7 @@ from hardware import setup
 
 
 app = Flask(__name__)
+CORS(app)
 mgr = Manager()
 data = mgr.list()
 status = mgr.Value('b', False)
@@ -25,7 +27,7 @@ def get_data():
 	graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 	return graphJSON
 
-@app.route('/run')
+@app.route('/run', methods=['GET'])
 @app.route('/run_from:<from_v>_to:<to_v>_count:<count_v>', methods=['GET'])
 def run_setup(from_v=0, to_v=5, count_v=10):
 	if not status.value:
