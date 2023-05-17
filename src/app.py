@@ -1,26 +1,43 @@
 from flask import Flask, render_template
+from markupsafe import escape
 import plotly.express as px
 import plotly
 import json
 import pandas as pd
 
-from hardware import SetupSimulation as Setup
+from multiprocessing import Manager, Process
+
+from hardware import setup
 # from hardware import Setup
 
 
 app = Flask(__name__)
-setup = Setup()
+mgr = Manager()
+data = mgr.list()
+status = mgr.Value('b', False)
 
-@app.route('/')
-def runpage_handler():
-	df = pd.DataFrame({
-		"Voltage": [1, 2, 3, 4, 5, 6],
-		"Current": [10, 15, 8, 5, 14, 25],
-	})
-	
-	fig = px.line(df, x="Voltage", y="Current")
+
+@app.route('/data', methods=['GET'])
+def get_data():
+	df = pd.DataFrame(list(data), columns=['Voltage', 'Current'])
+	fig = px.line(df, x='Voltage', y='Current')
 
 	graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-	header="Dependence"
+	return graphJSON
 
-	return render_template('index.html', graphJSON=graphJSON, header=header)
+@app.route('/run')
+@app.route('/run_from:<from_v>_to:<to_v>_count:<count_v>', methods=['GET'])
+def run_setup(from_v=0, to_v=5, count_v=10):
+	if not status.value:
+		while data:
+			data.pop()
+		p = Process(target=setup.run, args=(
+			float(escape(from_v)),
+			float(escape(to_v)),
+			int(escape(count_v)),
+			data, 
+			status))
+		p.daemon = True
+		p.start()
+
+	return str(status.value)

@@ -4,27 +4,17 @@ from datetime import datetime
 from random import random
 
 class SetupSimulation:
-	def __init__(self) -> None:
-		self.data = []
+	def run(self, from_v, to_v, count_v, data, status):
+		print(f'run with {from_v} {to_v} {count_v} params')
+		status.value = True
+		for u in np.linspace(from_v, to_v, count_v):
+			voltage = u
+			current = random() * 1e-6
 
-	def setVoltage(self, voltage):
-		pass
-
-	def getCurrent(self):
-		return random() * 1e-6
-
-	def getVoltage(self):
-		return random() * 5
-
-	def run(self):
-		for u in np.linspace(0, 5, 250):
-			self.setVoltage(u)
+			data.append((voltage, current))
+			print(data[-1])
 			sleep(1)
-			voltage = self.getVoltage()
-			current = self.getCurrent()
 
-			self.data.append((voltage, current))
-			print(self.data[-1])
-
-		filename = f"data_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
-		np.savetxt(filename, self.data, delimiter=",", header="voltage,current", comments="")
+		filename = rf"files/data_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
+		np.savetxt(filename, data, delimiter=",", header="voltage,current", comments="")
+		status.value = False
